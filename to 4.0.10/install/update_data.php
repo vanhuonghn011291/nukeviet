@@ -8,7 +8,7 @@
  */
 
 if( ! defined( 'NV_IS_UPDATE' ) ) die( 'Stop!!!' );
- 
+
 $nv_update_config = array();
 
 $nv_update_config['type'] = 1; // Kieu nang cap 1: Update; 2: Upgrade
@@ -45,18 +45,18 @@ $nv_update_config['lang']['en']['nv_up_finish'] = 'Update new version';
 // r: Revision neu la nang cap site, phien ban neu la nang cap module
 
 $nv_update_config['tasklist'] = array();
-$nv_update_config['tasklist'][] = array( 'r' => '4.0.10', 'rq' => 2, 'l' => 'nv_up_sysdb', 'f' => 'nv_up_sysdb' );
-$nv_update_config['tasklist'][] = array( 'r' => '4.0.10', 'rq' => 2, 'l' => 'nv_up_newsdb', 'f' => 'nv_up_newsdb' );
-$nv_update_config['tasklist'][] = array( 'r' => '4.0.10', 'rq' => 2, 'l' => 'nv_up_pagedb', 'f' => 'nv_up_pagedb' );
+$nv_update_config['tasklist'][] = array( 'r' => '4.0.10', 'rq' => 1, 'l' => 'nv_up_sysdb', 'f' => 'nv_up_sysdb' );
+$nv_update_config['tasklist'][] = array( 'r' => '4.0.10', 'rq' => 1, 'l' => 'nv_up_newsdb', 'f' => 'nv_up_newsdb' );
+$nv_update_config['tasklist'][] = array( 'r' => '4.0.10', 'rq' => 1, 'l' => 'nv_up_pagedb', 'f' => 'nv_up_pagedb' );
 $nv_update_config['tasklist'][] = array( 'r' => '4.0.10', 'rq' => 0, 'l' => 'nv_up_delfiles', 'f' => 'nv_up_delfiles' );
-$nv_update_config['tasklist'][] = array( 'r' => '4.0.10', 'rq' => 2, 'l' => 'nv_up_finish', 'f' => 'nv_up_finish' );
+$nv_update_config['tasklist'][] = array( 'r' => '4.0.10', 'rq' => 1, 'l' => 'nv_up_finish', 'f' => 'nv_up_finish' );
 
 // Danh sach cac function
 /*
 Chuan hoa tra ve:
 array(
 	'status' =>
-	'complete' => 
+	'complete' =>
 	'next' =>
 	'link' =>
 	'lang' =>
@@ -93,21 +93,21 @@ Kieu cap nhat module duoc ho tro boi bien $old_module_version
 
 /**
  * nv_up_sysdb()
- * 
+ *
  * @return
  */
 function nv_up_sysdb()
 {
 	global $nv_update_baseurl, $db, $db_config;
-	
+
 	$return = array( 'status' => 1, 'complete' => 1, 'next' => 1, 'link' => 'NO', 'lang' => 'NO', 'message' => '', );
-	
+
 	$sqls = array();
-	
+
 	// Các cập nhật cho hệ thống không liên quan tới ngôn ngữ
 	$sqls[] = "INSERT INTO " . NV_CONFIG_GLOBALTABLE . " VALUES  ('sys', 'global', 'upload_alt_require', '1')";
 	$sqls[] = "INSERT INTO " . NV_CONFIG_GLOBALTABLE . " VALUES  ('sys', 'global', 'upload_auto_alt', '1')";
-	
+
 	// Lấy tất cả ngôn ngữ của site
 	$language_query = $db->query( "SELECT lang FROM " . $db_config['prefix'] . "_setup_language WHERE setup = 1" );
 
@@ -115,10 +115,10 @@ function nv_up_sysdb()
 	{
 		$return['status'] = 0;
 		$return['complete'] = 0;
-		
+
 		return $return;
 	}
-	
+
 	// Duyệt tất cả các ngôn ngữ
 	while( list( $lang ) = $language_query->fetch( PDO::FETCH_NUM ) )
 	{
@@ -126,7 +126,7 @@ function nv_up_sysdb()
 		$sqls[] = "ALTER TABLE " . $db_config['prefix'] . "_" . $lang . "_menu_rows ADD icon VARCHAR(255) NOT NULL DEFAULT '' AFTER link;";
 		$sqls[] = "UPDATE " . $db_config['prefix'] . "_" . $lang . "_modfuncs SET func_name = 'sitemap', alias = 'sitemap' WHERE func_name='Sitemap'";
 	}
-	
+
 	// Thực hiện truy vấn dữ liệu
 	foreach( $sqls as $sql )
 	{
@@ -139,26 +139,26 @@ function nv_up_sysdb()
 			$return['status'] = 0;
 			$return['complete'] = 0;
 			$return['message'] = $e->getMessage();
-			
+
 			return $return;
 		}
 	}
-	
+
 	return $return;
 }
 
 /**
  * nv_up_newsdb()
- * 
+ *
  * @return
  */
 function nv_up_newsdb()
 {
 	global $nv_update_baseurl, $db, $db_config;
-	
+
 	$return = array( 'status' => 1, 'complete' => 1, 'next' => 1, 'link' => 'NO', 'lang' => 'NO', 'message' => '', );
 	$sqls = array();
-	
+
 	// Lấy tất cả ngôn ngữ của site
 	$language_query = $db->query( "SELECT lang FROM " . $db_config['prefix'] . "_setup_language WHERE setup = 1" );
 
@@ -166,23 +166,23 @@ function nv_up_newsdb()
 	{
 		$return['status'] = 0;
 		$return['complete'] = 0;
-		
+
 		return $return;
 	}
-	
+
 	// Duyệt tất cả các ngôn ngữ
 	while( list( $lang ) = $language_query->fetch( PDO::FETCH_NUM ) )
 	{
 		// Lấy tất cả các module news và module ảo của nó
 		$mquery = $db->query( "SELECT title, module_data FROM " . $db_config['prefix'] . "_" . $lang . "_modules WHERE module_file = 'news'" );
-		
+
 		while( list( $mod, $mod_data ) = $mquery->fetch( PDO::FETCH_NUM ) )
 		{
 			$sqls[] = "INSERT INTO " . NV_CONFIG_GLOBALTABLE . " VALUES  ('" . $lang . "', '" . $mod . "', 'structure_upload', 'Ym')";
 			$sqls[] = "INSERT INTO " . NV_CONFIG_GLOBALTABLE . " VALUES  ('" . $lang . "', '" . $mod . "', 'imgposition', '1')";
 		}
 	}
-	
+
 	// Thực hiện truy vấn dữ liệu
 	foreach( $sqls as $sql )
 	{
@@ -195,7 +195,7 @@ function nv_up_newsdb()
 			$return['status'] = 0;
 			$return['complete'] = 0;
 			$return['message'] = $e->getMessage();
-			
+
 			return $return;
 		}
 	}
@@ -205,16 +205,16 @@ function nv_up_newsdb()
 
 /**
  * nv_up_pagedb()
- * 
+ *
  * @return
  */
 function nv_up_pagedb()
 {
 	global $nv_update_baseurl, $db, $db_config;
-	
+
 	$return = array( 'status' => 1, 'complete' => 1, 'next' => 1, 'link' => 'NO', 'lang' => 'NO', 'message' => '', );
 	$sqls = array();
-	
+
 	// Lấy tất cả ngôn ngữ của site
 	$language_query = $db->query( "SELECT lang FROM " . $db_config['prefix'] . "_setup_language WHERE setup = 1" );
 
@@ -222,16 +222,16 @@ function nv_up_pagedb()
 	{
 		$return['status'] = 0;
 		$return['complete'] = 0;
-		
+
 		return $return;
 	}
-	
+
 	// Duyệt tất cả các ngôn ngữ
 	while( list( $lang ) = $language_query->fetch( PDO::FETCH_NUM ) )
 	{
 		// Lấy tất cả các module page và module ảo của nó
 		$mquery = $db->query( "SELECT title, module_data FROM " . $db_config['prefix'] . "_" . $lang . "_modules WHERE module_file = 'page'" );
-		
+
 		while( list( $mod, $mod_data ) = $mquery->fetch( PDO::FETCH_NUM ) )
 		{
 			$sqls[] = "ALTER TABLE " . $db_config['prefix'] . "_" . $lang . "_" . $mod_data . " DROP facebookappid";
@@ -239,7 +239,7 @@ function nv_up_pagedb()
 			$sqls[] = "INSERT INTO " . $db_config['prefix'] . "_" . $lang . "_" . $mod_data . "_config VALUES  ('viewtype', '0'),  ('facebookapi', '')";
 		}
 	}
-	
+
 	// Thực hiện truy vấn dữ liệu
 	foreach( $sqls as $sql )
 	{
@@ -252,7 +252,7 @@ function nv_up_pagedb()
 			$return['status'] = 0;
 			$return['complete'] = 0;
 			$return['message'] = $e->getMessage();
-			
+
 			return $return;
 		}
 	}
@@ -262,13 +262,13 @@ function nv_up_pagedb()
 
 /**
  * nv_up_delfiles()
- * 
+ *
  * @return
  */
 function nv_up_delfiles()
 {
 	global $nv_update_baseurl;
-	
+
 	$return = array( 'status' => 1, 'complete' => 1, 'next' => 1, 'link' => 'NO', 'lang' => 'NO', 'message' => '', );
 
 	@nv_deletefile( NV_ROOTDIR . '/editors/ckeditor/plugins/autosave/lang/', true );
@@ -277,25 +277,25 @@ function nv_up_delfiles()
 	@nv_deletefile( NV_ROOTDIR . '/modules/news/funcs/Sitemap.php' );
 	@nv_deletefile( NV_ROOTDIR . '/modules/page/funcs/Sitemap.php' );
 	@nv_deletefile( NV_ROOTDIR . '/modules/news/admin/blocksajax.php' );
-	
+
 	return $return;
 }
 
 /**
  * nv_up_finish()
- * 
+ *
  * @return
  */
 function nv_up_finish()
 {
 	global $nv_update_baseurl, $db;
-	
+
 	$return = array( 'status' => 1, 'complete' => 1, 'next' => 1, 'link' => 'NO', 'lang' => 'NO', 'message' => '', );
-	
+
 	$db->query( "UPDATE " . NV_CONFIG_GLOBALTABLE . " SET config_value = '4.0.10' WHERE lang = 'sys' AND module = 'global' AND config_name = 'version'" );
 
 	nv_save_file_config_global();
-	
+
 	return $return;
 }
 
