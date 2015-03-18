@@ -1786,7 +1786,7 @@ function nv_insert_logs( $lang = '', $module_name = '', $name_key = '', $note_ac
  */
 function nv_site_mods( $module_name = '' )
 {
-	global $sys_mods, $admin_info, $user_info, $admin_info, $global_config, $db;
+	global $sys_mods, $admin_info, $user_info, $admin_info, $global_config, $db, $lang_global, $client_info;
 
 	$site_mods = $sys_mods;
 	if( defined( 'NV_SYSTEM' ) )
